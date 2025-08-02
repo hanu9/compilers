@@ -1,10 +1,9 @@
 # Check for latest version here: https://hub.docker.com/_/buildpack-deps?tab=tags&page=1&name=buster&ordering=last_updated
 # This is just a snapshot of buildpack-deps:buster that was last updated on 2019-12-28.
-FROM buildpack-deps:stable
+FROM judge0/buildpack-deps:buster-2019-12-28
 
 # Check for latest version here: https://gcc.gnu.org/releases.html, https://ftpmirror.gnu.org/gcc
-ENV GCC_VERSIONS \
-      14.3.0
+ENV GCC_VERSIONS="14.3.0"
 RUN set -xe && \
     for VERSION in $GCC_VERSIONS; do \
       curl -fSsL "https://ftpmirror.gnu.org/gcc/gcc-$VERSION/gcc-$VERSION.tar.gz" -o /tmp/gcc-$VERSION.tar.gz && \
@@ -31,8 +30,7 @@ RUN set -xe && \
     done
 
 # Check for latest version here: https://www.ruby-lang.org/en/downloads
-ENV RUBY_VERSIONS \
-      3.4.5
+ENV RUBY_VERSIONS=3.4.5
 RUN set -xe && \
     for VERSION in $RUBY_VERSIONS; do \
       curl -fSsL "https://cache.ruby-lang.org/pub/ruby/${VERSION%.*}/ruby-$VERSION.tar.gz" -o /tmp/ruby-$VERSION.tar.gz && \
@@ -49,8 +47,7 @@ RUN set -xe && \
     done
 
 # Check for latest version here: https://www.python.org/downloads
-ENV PYTHON_VERSIONS \
-      3.13.5
+ENV PYTHON_VERSIONS=3.13.5
 RUN set -xe && \
     for VERSION in $PYTHON_VERSIONS; do \
       curl -fSsL "https://www.python.org/ftp/python/$VERSION/Python-$VERSION.tar.xz" -o /tmp/python-$VERSION.tar.xz && \
@@ -63,7 +60,9 @@ RUN set -xe && \
       make -j$(nproc) && \
       make -j$(nproc) install && \
       rm -rf /tmp/*; \
-    done
+    done && \
+    ln -sf /usr/local/python-3.13.5/bin/python3 /usr/local/bin/python3 && \
+    ln -sf /usr/local/python-3.13.5/bin/python3 /usr/local/bin/python
 
 # Check for latest version here: https://jdk.java.net
 RUN set -xe && \
@@ -76,8 +75,7 @@ RUN set -xe && \
     ln -s /usr/local/openjdk24/bin/jar /usr/local/bin/jar
 
 # Check for latest version here: https://ftpmirror.gnu.org/bash
-ENV BASH_VERSIONS \
-      5.0
+ENV BASH_VERSIONS=5.0
 RUN set -xe && \
     for VERSION in $BASH_VERSIONS; do \
       curl -fSsL "https://ftpmirror.gnu.org/bash/bash-$VERSION.tar.gz" -o /tmp/bash-$VERSION.tar.gz && \
@@ -93,8 +91,7 @@ RUN set -xe && \
     done
 
 # Check for latest version here: https://nodejs.org/en
-ENV NODE_VERSIONS \
-      22.17.1
+ENV NODE_VERSIONS=22.17.1
 RUN set -xe && \
     for VERSION in $NODE_VERSIONS; do \
       curl -fSsL "https://nodejs.org/dist/v$VERSION/node-v$VERSION.tar.gz" -o /tmp/node-$VERSION.tar.gz && \
@@ -102,6 +99,9 @@ RUN set -xe && \
       tar -xf /tmp/node-$VERSION.tar.gz -C /tmp/node-$VERSION --strip-components=1 && \
       rm /tmp/node-$VERSION.tar.gz && \
       cd /tmp/node-$VERSION && \
+      export CC=/usr/local/gcc-10.4.0/bin/gcc && \
+      export CXX=/usr/local/gcc-10.4.0/bin/g++ && \
+      export PATH="/usr/local/gcc-10.4.0/bin:$PATH" && \
       ./configure \
         --prefix=/usr/local/node-$VERSION && \
       make -j$(nproc) && \
@@ -110,8 +110,7 @@ RUN set -xe && \
     done
 
 # Check for latest version here: https://www.rust-lang.org
-ENV RUST_VERSIONS \
-      1.88.0
+ENV RUST_VERSIONS=1.88.0
 RUN set -xe && \
     for VERSION in $RUST_VERSIONS; do \
       curl -fSsL "https://static.rust-lang.org/dist/rust-$VERSION-x86_64-unknown-linux-gnu.tar.gz" -o /tmp/rust-$VERSION.tar.gz && \
@@ -126,8 +125,7 @@ RUN set -xe && \
     done
 
 # Check for latest version here: https://golang.org/dl
-ENV GO_VERSIONS \
-      1.24.1
+ENV GO_VERSIONS=1.24.1
 RUN set -xe && \
     for VERSION in $GO_VERSIONS; do \
       curl -fSsL "https://storage.googleapis.com/golang/go$VERSION.linux-amd64.tar.gz" -o /tmp/go-$VERSION.tar.gz && \
@@ -137,8 +135,7 @@ RUN set -xe && \
     done
 
 # Check for latest version here: https://www.php.net/downloads
-ENV PHP_VERSIONS \
-      8.4.11
+ENV PHP_VERSIONS=8.4.11
 RUN set -xe && \
     apt-get update && \
     apt-get install -y --no-install-recommends bison re2c && \
@@ -158,8 +155,7 @@ RUN set -xe && \
     done
 
 # Check for latest version here: https://github.com/microsoft/TypeScript/releases
-ENV TYPESCRIPT_VERSIONS \
-      5.8.3
+ENV TYPESCRIPT_VERSIONS=5.8.3
 RUN set -xe && \
     curl -fSsL "https://deb.nodesource.com/setup_12.x" | bash - && \
     apt-get update && \
@@ -193,7 +189,7 @@ RUN set -xe && \
     git checkout ad39cc4d0fbb577fb545910095c9da5ef8fc9a1a && \
     make -j$(nproc) install && \
     rm -rf /tmp/*
-ENV BOX_ROOT /var/local/lib/isolate
+ENV BOX_ROOT=/var/local/lib/isolate
 
 LABEL maintainer="Herman Zvonimir Došilović <hermanz.dosilovic@gmail.com>"
 LABEL version="1.4.0"
