@@ -129,7 +129,7 @@ RUN set -xe && \
     done
 
 # Install Ruby from source (needed for specific version)
-ENV RUBY_VERSIONS=3.4.5
+ENV RUBY_VERSIONS=2.7.0
 RUN set -xe && \
     for VERSION in $RUBY_VERSIONS; do \
       curl -fSsL "https://cache.ruby-lang.org/pub/ruby/${VERSION%.*}/ruby-$VERSION.tar.gz" -o /tmp/ruby-$VERSION.tar.gz && \
